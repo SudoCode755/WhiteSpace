@@ -1,0 +1,71 @@
+{
+   "version": 2,
+   "configurePresets": [
+
+      {
+         "name": "gcc-ninja-config-base",
+         "hidden": true,
+         "generator": "Ninja",
+         "binaryDir": "${sourceDir}/build/gcc-ninja",
+         "cacheVariables": {
+            "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+            "CMAKE_C_COMPILER": "gcc-13",
+            "CMAKE_CXX_COMPILER": "g++-13",
+            "CMAKE_CXX_FLAGS": "-Werror -Wall -Wextra -pedantic",
+            "WHITESPACE_USE_CONAN": false
+         }
+      },
+      {
+         "name": "gcc-ninja-config-debug",
+         "inherits": "gcc-ninja-config-base",
+         "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Debug"
+         }
+      },
+      {
+         "name": "gcc-ninja-config-release",
+         "inherits": "gcc-ninja-config-base",
+         "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Release"
+         }
+      },
+      {
+         "name": "VS-Config-Base",
+         "displayName": "Visual Studio Community 2022 Release - x86_amd64",
+         "description": "Using compilers for Visual Studio 17 2022 (x86_x64 architecture)",
+         "generator": "Visual Studio 17 2022",
+         "toolset": "host=x86",
+         "architecture": "x64",
+         "binaryDir": "${sourceDir}/build/msvc",
+         "cacheVariables": {
+            "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+            "CMAKE_C_COMPILER": "cl.exe",
+            "CMAKE_CXX_COMPILER": "cl.exe",
+            "CMAKE_CXX_FLAGS": "/EHsc",
+            "WHITESPACE_USE_CONAN": false
+         }
+      }
+   ],
+   "buildPresets": [
+      {
+         "name": "Build-gcc-Debug",
+         "configurePreset": "gcc-ninja-config-debug",
+         "configuration": "Debug"
+      },
+      {
+         "name": "Build-gcc-Release",
+         "configurePreset": "gcc-ninja-config-release",
+         "configuration": "Release"
+      },
+      {
+         "name": "Build-msvc-Debug",
+         "configurePreset": "VS-Config-Base",
+         "configuration": "Debug"
+      },
+      {
+         "name": "Build-msvc-Release",
+         "configurePreset": "VS-Config-Base",
+         "configuration": "Release"
+      }
+   ]
+}
