@@ -3,9 +3,9 @@
 #include <core.hpp>
 #include <env.hpp>
 
+#include <array>
 #include <cstddef>
 #include <optional>
-#include <array>
 
 namespace {
 
@@ -35,18 +35,14 @@ std::optional<std::size_t> heap_retrieve()
   return std::nullopt;
 }
 
-InstructionParseResult get_heap_store_fn(const std::string&,
-                                         const std::size_t,
-                                         const std::size_t)
+InstructionParseResult get_heap_store_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = heap_store,
   };
 }
 
-InstructionParseResult get_heap_retrieve_fn(const std::string&,
-                                            const std::size_t,
-                                            const std::size_t)
+InstructionParseResult get_heap_retrieve_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = heap_retrieve,

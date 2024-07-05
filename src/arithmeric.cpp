@@ -4,12 +4,12 @@
 #include <env.hpp>
 #include <utils.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <span>
 #include <string_view>
-#include <array>
 
 namespace {
 
@@ -58,17 +58,13 @@ std::optional<std::size_t> generic_arithmetic_op()
   else if constexpr (op == ArithmeticOp::MOD)
   {
     const int64_t result = first_operand % second_operand;
-    data::stack_push((first_operand * second_operand < 0)
-                         ? result + second_operand
-                         : result);
+    data::stack_push((first_operand * second_operand < 0) ? result + second_operand : result);
   }
   return std::nullopt;
 }
 
 template<ArithmeticOp op>
-InstructionParseResult get_arithmetic_fn(const std::string&,
-                                         const std::size_t,
-                                         const std::size_t)
+InstructionParseResult get_arithmetic_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = generic_arithmetic_op<op>,

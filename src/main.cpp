@@ -3,7 +3,6 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <array>
 
 void print_usage()
 {

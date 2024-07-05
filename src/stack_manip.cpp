@@ -4,11 +4,11 @@
 #include <env.hpp>
 #include <utils.hpp>
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
 #include <string_view>
-#include <array>
 
 namespace {
 
@@ -57,9 +57,7 @@ std::optional<std::size_t> pop_op()
   return std::nullopt;
 }
 
-InstructionParseResult get_push_fn(const std::string& script,
-                                   const std::size_t  program_counter,
-                                   const std::size_t)
+InstructionParseResult get_push_fn(const std::string& script, const std::size_t program_counter, const std::size_t)
 {
   const auto [num, num_size] = parse_int(script, program_counter);
   return {
@@ -68,27 +66,21 @@ InstructionParseResult get_push_fn(const std::string& script,
   };
 }
 
-InstructionParseResult get_duplicate_fn(const std::string&,
-                                        const std::size_t,
-                                        const std::size_t)
+InstructionParseResult get_duplicate_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = duplicate_op,
   };
 }
 
-InstructionParseResult get_swap_fn(const std::string&,
-                                   const std::size_t,
-                                   const std::size_t)
+InstructionParseResult get_swap_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = swap_op,
   };
 }
 
-InstructionParseResult get_pop_fn(const std::string&,
-                                  const std::size_t,
-                                  const std::size_t)
+InstructionParseResult get_pop_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = pop_op,

@@ -4,11 +4,11 @@
 #include <env.hpp>
 #include <utils.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string_view>
-#include <array>
 
 namespace {
 
@@ -39,15 +39,13 @@ static constexpr std::string_view JUMP_IF_NEG_TAG("[JUMP IF NEGATIVE]");
 static constexpr std::string_view RETURN_TAG("[RETURN]");
 static constexpr std::string_view EXIT_TAG("[EXIT]");
 
-std::optional<std::size_t> mark_op(const int64_t     label,
-                                   const std::size_t instruction_index)
+std::optional<std::size_t> mark_op(const int64_t label, const std::size_t instruction_index)
 {
   instruction::label_add(label, instruction_index);
   return std::nullopt;
 }
 
-std::optional<std::size_t> call_op(const int64_t     label,
-                                   const std::size_t instruction_index)
+std::optional<std::size_t> call_op(const int64_t label, const std::size_t instruction_index)
 {
   instruction::return_address_push(instruction_index + 1);
   return instruction::label_get(label);
@@ -109,9 +107,7 @@ InstructionParseResult get_call_fn(const std::string& script,
   };
 }
 
-InstructionParseResult get_jump_fn(const std::string& script,
-                                   const std::size_t  index,
-                                   const std::size_t)
+InstructionParseResult get_jump_fn(const std::string& script, const std::size_t index, const std::size_t)
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
@@ -120,9 +116,7 @@ InstructionParseResult get_jump_fn(const std::string& script,
   };
 }
 
-InstructionParseResult get_jump_if_zero_fn(const std::string& script,
-                                           const std::size_t  index,
-                                           const std::size_t)
+InstructionParseResult get_jump_if_zero_fn(const std::string& script, const std::size_t index, const std::size_t)
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
@@ -131,9 +125,7 @@ InstructionParseResult get_jump_if_zero_fn(const std::string& script,
   };
 }
 
-InstructionParseResult get_jump_if_negative_fn(const std::string& script,
-                                               const std::size_t  index,
-                                               const std::size_t)
+InstructionParseResult get_jump_if_negative_fn(const std::string& script, const std::size_t index, const std::size_t)
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
@@ -142,18 +134,14 @@ InstructionParseResult get_jump_if_negative_fn(const std::string& script,
   };
 }
 
-InstructionParseResult get_return_fn(const std::string&,
-                                     const std::size_t,
-                                     const std::size_t)
+InstructionParseResult get_return_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = return_op,
   };
 }
 
-InstructionParseResult get_exit_fn(const std::string&,
-                                   const std::size_t,
-                                   const std::size_t)
+InstructionParseResult get_exit_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = exit_op,

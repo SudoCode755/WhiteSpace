@@ -9,6 +9,7 @@
 #include <stack_manip.hpp>
 #include <utils.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstring>
@@ -20,7 +21,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <algorithm>
 
 namespace {
 
@@ -72,13 +72,11 @@ struct Instruction
 };
 
 template<IMP imp_code>
-constexpr std::pair<std::optional<Instruction>, std::size_t>
-    try_parse(const std::string& script,
-              const std::size_t  script_index,
-              const std::size_t  instruction_index)
+constexpr std::pair<std::optional<Instruction>, std::size_t> try_parse(const std::string& script,
+                                                                       const std::size_t  script_index,
+                                                                       const std::size_t  instruction_index)
 {
-  const auto&& [imp_tag, get_operation_parsers]
-      = get_imp_parse_data<imp_code>();
+  const auto&& [imp_tag, get_operation_parsers] = get_imp_parse_data<imp_code>();
 
   std::string_view parsed_op_tag;
   auto const       operation_parsers = get_operation_parsers();
@@ -88,11 +86,8 @@ constexpr std::pair<std::optional<Instruction>, std::size_t>
     {
       if (equal_to_token(script, script_index, op_token))
       {
-        parsed_op_tag = op_tag;
-        auto&& [instruction_fn, argument_size]
-            = op_func(script,
-                      script_index + op_token.size(),
-                      instruction_index);
+        parsed_op_tag                          = op_tag;
+        auto&& [instruction_fn, argument_size] = op_func(script, script_index + op_token.size(), instruction_index);
         if constexpr (imp_code == IMP::FLOW_CONTROL)
         {
           if (op_token == "  ")
@@ -135,9 +130,7 @@ constexpr std::pair<std::optional<Instruction>, std::size_t>
 }
 
 using ParserFn
-    = std::pair<std::optional<Instruction>, std::size_t> (*)(const std::string&,
-                                                             const std::size_t,
-                                                             const std::size_t);
+    = std::pair<std::optional<Instruction>, std::size_t> (*)(const std::string&, const std::size_t, const std::size_t);
 
 template<IMP imp>
 constexpr std::pair<std::string_view, ParserFn> get_imp_data()
@@ -164,15 +157,13 @@ constexpr std::pair<std::string_view, ParserFn> get_imp_data()
   }
 }
 
-constexpr static std::array<std::pair<std::string_view, ParserFn>, 5>
-    imp_parsers = {get_imp_data<IMP::STACK_MANIP>(),
-                   get_imp_data<IMP::ARITHMETIC>(),
-                   get_imp_data<IMP::HEAP_ACCESS>(),
-                   get_imp_data<IMP::FLOW_CONTROL>(),
-                   get_imp_data<IMP::IO_OPS>()};
+constexpr static std::array<std::pair<std::string_view, ParserFn>, 5> imp_parsers = {get_imp_data<IMP::STACK_MANIP>(),
+                                                                                     get_imp_data<IMP::ARITHMETIC>(),
+                                                                                     get_imp_data<IMP::HEAP_ACCESS>(),
+                                                                                     get_imp_data<IMP::FLOW_CONTROL>(),
+                                                                                     get_imp_data<IMP::IO_OPS>()};
 
-std::size_t try_execute(const Instruction& instruction,
-                        const std::size_t  program_counter)
+std::size_t try_execute(const Instruction& instruction, const std::size_t program_counter)
 {
   try
   {
@@ -202,9 +193,8 @@ std::vector<Instruction> parse_script(const std::string& script)
     {
       if (equal_to_token(script, index, imp_token))
       {
-        auto&& [opt_instruction, next_index]
-            = parser_fn(script, index + imp_token.size(), instructions.size());
-        index = next_index;
+        auto&& [opt_instruction, next_index] = parser_fn(script, index + imp_token.size(), instructions.size());
+        index                                = next_index;
         if (opt_instruction.has_value())
         {
           instructions.emplace_back(opt_instruction.value());
@@ -236,8 +226,7 @@ void run_script(std::istream& script, std::ostream& output, std::istream& input)
   std::size_t              program_counter = 0;
   while (program_counter < instructions.size())
   {
-    program_counter
-        = try_execute(instructions[program_counter], program_counter);
+    program_counter = try_execute(instructions[program_counter], program_counter);
   }
   if (! instruction::get_terminated())
   {

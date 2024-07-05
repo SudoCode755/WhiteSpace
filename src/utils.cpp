@@ -2,15 +2,12 @@
 
 #include <stdexcept>
 
-bool equal_to_token(const std::string&     script,
-                    const std::size_t      program_counter,
-                    const std::string_view token)
+bool equal_to_token(const std::string& script, const std::size_t program_counter, const std::string_view token)
 {
   return script.compare(program_counter, token.size(), token) == 0;
 }
 
-std::pair<int64_t, std::size_t> parse_int(const std::string& script,
-                                          const std::size_t  program_counter)
+std::pair<int64_t, std::size_t> parse_int(const std::string& script, const std::size_t program_counter)
 {
   if (script[program_counter] == '\n')
   {
@@ -19,8 +16,7 @@ std::pair<int64_t, std::size_t> parse_int(const std::string& script,
   int64_t       num      = 0;
   const int64_t sign     = script[program_counter] == '\t' ? -1 : 1;
   std::size_t   num_size = 1;
-  while ((program_counter + num_size < script.size())
-         && script[program_counter + num_size] != '\n')
+  while ((program_counter + num_size < script.size()) && script[program_counter + num_size] != '\n')
   {
     num *= 2;
     num += ((script[program_counter + num_size] == '\t') ? 1 : 0);

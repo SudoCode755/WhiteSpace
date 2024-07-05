@@ -3,9 +3,9 @@
 #include <core.hpp>
 #include <env.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <array>
 
 namespace {
 
@@ -44,9 +44,7 @@ std::optional<std::size_t> in_op()
 }
 
 template<typename T>
-InstructionParseResult get_out_fn(const std::string&,
-                                  const std::size_t,
-                                  const std::size_t)
+InstructionParseResult get_out_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = out_op<T>,
@@ -54,9 +52,7 @@ InstructionParseResult get_out_fn(const std::string&,
 }
 
 template<typename T>
-InstructionParseResult get_in_fn(const std::string&,
-                                 const std::size_t,
-                                 const std::size_t)
+InstructionParseResult get_in_fn(const std::string&, const std::size_t, const std::size_t)
 {
   return {
       .instruction_fn = in_op<T>,
