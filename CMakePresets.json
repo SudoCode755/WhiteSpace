@@ -12,7 +12,7 @@
             "CMAKE_C_COMPILER": "gcc-13",
             "CMAKE_CXX_COMPILER": "g++-13",
             "CMAKE_CXX_FLAGS": "-Werror -Wall -Wextra -pedantic",
-            "WHITESPACE_USE_CONAN": false
+            "WHITESPACE_USE_CONAN": true
          }
       },
       {
@@ -42,7 +42,7 @@
             "CMAKE_C_COMPILER": "cl.exe",
             "CMAKE_CXX_COMPILER": "cl.exe",
             "CMAKE_CXX_FLAGS": "/EHsc",
-            "WHITESPACE_USE_CONAN": false
+            "WHITESPACE_USE_CONAN": true
          }
       }
    ],

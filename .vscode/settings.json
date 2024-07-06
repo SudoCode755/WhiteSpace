@@ -1,10 +1,17 @@
 {
     "editor.tabSize": 2,
     "clangd.arguments": [
-        "-log=verbose", 
-        "-pretty", 
-        "--background-index", 
+        "-log=verbose",
+        "-pretty",
+        "--background-index",
         //"--query-driver=/bin/arm-buildroot-linux-gnueabihf-g++", //for cross compile usage
         "--compile-commands-dir=${workspaceFolder}/build/"
-    ]
+    ],
+    "testMate.cpp.debug.configTemplate": "test_debug:ctest dbg launch",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "[dart]": {
+        "editor.formatOnType": false
+    }
 }

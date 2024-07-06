@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Whitespace",
+            "type": "cppdbg",
+            "cwd": "${workspaceFolder}",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gcc-ninja/bin/WhiteSpace",
+            "args": []
+        },
+        {
             "name": "ctest dbg launch",
             "type": "cppdbg",
             "cwd": "${workspaceFolder}",
