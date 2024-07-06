@@ -2,10 +2,10 @@
 
 #include <arithmetic.hpp>
 #include <core.hpp>
-#include <env.hpp>
 #include <flow_control.hpp>
 #include <heap_access.hpp>
 #include <io_ops.hpp>
+#include <program_state.hpp>
 #include <stack_manip.hpp>
 #include <utils.hpp>
 
@@ -74,7 +74,8 @@ struct Instruction
 template<IMP imp_code>
 constexpr std::pair<std::optional<Instruction>, std::size_t> try_parse(const std::string& script,
                                                                        const std::size_t  script_index,
-                                                                       const std::size_t  instruction_index)
+                                                                       const std::size_t  instruction_index,
+                                                                       ProgramState&      state)
 {
   const auto&& [imp_tag, get_operation_parsers] = get_imp_parse_data<imp_code>();
 
@@ -92,7 +93,7 @@ constexpr std::pair<std::optional<Instruction>, std::size_t> try_parse(const std
         {
           if (op_token == "  ")
           {
-            instruction_fn();
+            instruction_fn(state);
             return {
                 std::nullopt,
                 script_index + op_token.size() + argument_size,
@@ -129,8 +130,10 @@ constexpr std::pair<std::optional<Instruction>, std::size_t> try_parse(const std
   return {std::nullopt, -1};
 }
 
-using ParserFn
-    = std::pair<std::optional<Instruction>, std::size_t> (*)(const std::string&, const std::size_t, const std::size_t);
+using ParserFn = std::pair<std::optional<Instruction>, std::size_t> (*)(const std::string&,
+                                                                        const std::size_t,
+                                                                        const std::size_t,
+                                                                        ProgramState& state);
 
 template<IMP imp>
 constexpr std::pair<std::string_view, ParserFn> get_imp_data()
@@ -163,11 +166,11 @@ constexpr static std::array<std::pair<std::string_view, ParserFn>, 5> imp_parser
                                                                                      get_imp_data<IMP::FLOW_CONTROL>(),
                                                                                      get_imp_data<IMP::IO_OPS>()};
 
-std::size_t try_execute(const Instruction& instruction, const std::size_t program_counter)
+std::size_t try_execute(const Instruction& instruction, const std::size_t program_counter, ProgramState& state)
 {
   try
   {
-    const auto next_jump_location_opt = instruction.instruction_fn();
+    const auto next_jump_location_opt = instruction.instruction_fn(state);
     return next_jump_location_opt.value_or(program_counter + 1);
   }
   catch (std::runtime_error& e)
@@ -183,7 +186,7 @@ std::size_t try_execute(const Instruction& instruction, const std::size_t progra
   return -1;
 }
 
-std::vector<Instruction> parse_script(const std::string& script)
+std::vector<Instruction> parse_script(const std::string& script, ProgramState& state)
 {
   std::size_t              index = 0;
   std::vector<Instruction> instructions;
@@ -193,7 +196,7 @@ std::vector<Instruction> parse_script(const std::string& script)
     {
       if (equal_to_token(script, index, imp_token))
       {
-        auto&& [opt_instruction, next_index] = parser_fn(script, index + imp_token.size(), instructions.size());
+        auto&& [opt_instruction, next_index] = parser_fn(script, index + imp_token.size(), instructions.size(), state);
         index                                = next_index;
         if (opt_instruction.has_value())
         {
@@ -220,15 +223,16 @@ std::string filter_chars(std::istream& script_in)
 
 void run_script(std::istream& script, std::ostream& output, std::istream& input)
 {
-  io_settings::set_output_stream(output);
-  io_settings::set_input_stream(input);
-  std::vector<Instruction> instructions    = parse_script(filter_chars(script));
+  ProgramState state;
+  state.io_settings.set_output_stream(output);
+  state.io_settings.set_input_stream(input);
+  std::vector<Instruction> instructions    = parse_script(filter_chars(script), state);
   std::size_t              program_counter = 0;
   while (program_counter < instructions.size())
   {
-    program_counter = try_execute(instructions[program_counter], program_counter);
+    program_counter = try_execute(instructions[program_counter], program_counter, state);
   }
-  if (! instruction::get_terminated())
+  if (! state.get_terminated())
   {
     throw std::runtime_error("Prgroma terminated incorrectly "
                              "[FLOW][EXIT](\"\\n\\n\\n\") was never executed");

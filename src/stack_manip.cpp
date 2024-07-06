@@ -1,7 +1,7 @@
 #include "stack_manip.hpp"
 
 #include <core.hpp>
-#include <env.hpp>
+#include <program_state.hpp>
 #include <utils.hpp>
 
 #include <array>
@@ -30,30 +30,30 @@ static constexpr std::string_view DUPLICATE_TAG("[DUPLICATE]");
 static constexpr std::string_view SWAP_TAG("[SWAP]");
 static constexpr std::string_view POP_TAG("[POP]");
 
-std::optional<std::size_t> push_op(const int64_t num)
+std::optional<std::size_t> push_op(const int64_t num, ProgramState& state)
 {
-  data::stack_push(num);
+  state.data_memory.stack_push(num);
   return std::nullopt;
 }
 
-std::optional<std::size_t> duplicate_op()
+std::optional<std::size_t> duplicate_op(ProgramState& state)
 {
-  data::stack_push(data::stack_top());
+  state.data_memory.stack_push(state.data_memory.stack_top());
   return std::nullopt;
 }
 
-std::optional<std::size_t> swap_op()
+std::optional<std::size_t> swap_op(ProgramState& state)
 {
-  const int64_t old_top = data::stack_pop();
-  const int64_t new_top = data::stack_pop();
-  data::stack_push(old_top);
-  data::stack_push(new_top);
+  const int64_t old_top = state.data_memory.stack_pop();
+  const int64_t new_top = state.data_memory.stack_pop();
+  state.data_memory.stack_push(old_top);
+  state.data_memory.stack_push(new_top);
   return std::nullopt;
 }
 
-std::optional<std::size_t> pop_op()
+std::optional<std::size_t> pop_op(ProgramState& state)
 {
-  data::stack_pop();
+  state.data_memory.stack_pop();
   return std::nullopt;
 }
 
@@ -61,7 +61,7 @@ InstructionParseResult get_push_fn(const std::string& script, const std::size_t 
 {
   const auto [num, num_size] = parse_int(script, program_counter);
   return {
-      .instruction_fn = std::bind(push_op, num),
+      .instruction_fn = std::bind(push_op, num, std::placeholders::_1),
       .argument_size  = num_size,
   };
 }

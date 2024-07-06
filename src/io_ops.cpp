@@ -1,7 +1,7 @@
 #include "io_ops.hpp"
 
 #include <core.hpp>
-#include <env.hpp>
+#include <program_state.hpp>
 
 #include <array>
 #include <cstddef>
@@ -28,18 +28,18 @@ static constexpr std::string_view CHAR_IN_TAG("[CHAR IN]");
 static constexpr std::string_view INT_IN_TAG("[INT IN]");
 
 template<typename T>
-std::optional<std::size_t> out_op()
+std::optional<std::size_t> out_op(ProgramState& state)
 {
-  io_settings::get_output_stream() << static_cast<T>(data::stack_pop());
+  state.io_settings.get_output_stream() << static_cast<T>(state.data_memory.stack_pop());
   return std::nullopt;
 }
 
 template<typename T>
-std::optional<std::size_t> in_op()
+std::optional<std::size_t> in_op(ProgramState& state)
 {
   T input;
-  io_settings::get_input_stream() >> input;
-  data::heap_store(data::stack_pop(), input);
+  state.io_settings.get_input_stream() >> input;
+  state.data_memory.heap_store(state.data_memory.stack_pop(), input);
   return std::nullopt;
 }
 

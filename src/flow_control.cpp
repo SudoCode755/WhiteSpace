@@ -1,7 +1,7 @@
 #include "flow_control.hpp"
 
 #include <core.hpp>
-#include <env.hpp>
+#include <program_state.hpp>
 #include <utils.hpp>
 
 #include <array>
@@ -39,49 +39,49 @@ static constexpr std::string_view JUMP_IF_NEG_TAG("[JUMP IF NEGATIVE]");
 static constexpr std::string_view RETURN_TAG("[RETURN]");
 static constexpr std::string_view EXIT_TAG("[EXIT]");
 
-std::optional<std::size_t> mark_op(const int64_t label, const std::size_t instruction_index)
+std::optional<std::size_t> mark_op(const int64_t label, const std::size_t instruction_index, ProgramState& state)
 {
-  instruction::label_add(label, instruction_index);
+  state.instruction_memory.label_add(label, instruction_index);
   return std::nullopt;
 }
 
-std::optional<std::size_t> call_op(const int64_t label, const std::size_t instruction_index)
+std::optional<std::size_t> call_op(const int64_t label, const std::size_t instruction_index, ProgramState& state)
 {
-  instruction::return_address_push(instruction_index + 1);
-  return instruction::label_get(label);
+  state.instruction_memory.return_address_push(instruction_index + 1);
+  return state.instruction_memory.label_get(label);
 }
 
-std::optional<std::size_t> jump_op(const int64_t label)
+std::optional<std::size_t> jump_op(const int64_t label, ProgramState& state)
 {
-  return instruction::label_get(label);
+  return state.instruction_memory.label_get(label);
 }
 
-std::optional<std::size_t> jump_if_zero_op(const int64_t label)
+std::optional<std::size_t> jump_if_zero_op(const int64_t label, ProgramState& state)
 {
-  if (data::stack_pop() != 0)
+  if (state.data_memory.stack_pop() != 0)
   {
     return std::nullopt;
   }
-  return instruction::label_get(label);
+  return state.instruction_memory.label_get(label);
 }
 
-std::optional<std::size_t> jump_if_neg_op(const int64_t label)
+std::optional<std::size_t> jump_if_neg_op(const int64_t label, ProgramState& state)
 {
-  if (data::stack_pop() >= 0)
+  if (state.data_memory.stack_pop() >= 0)
   {
     return std::nullopt;
   }
-  return instruction::label_get(label);
+  return state.instruction_memory.label_get(label);
 }
 
-std::optional<std::size_t> return_op()
+std::optional<std::size_t> return_op(ProgramState& state)
 {
-  return instruction::return_address_pop();
+  return state.instruction_memory.return_address_pop();
 }
 
-std::optional<std::size_t> exit_op()
+std::optional<std::size_t> exit_op(ProgramState& state)
 {
-  instruction::set_terminated();
+  state.set_terminated();
   return -1;
 }
 
@@ -91,7 +91,7 @@ InstructionParseResult get_mark_fn(const std::string& script,
 {
   const auto [label, label_size] = parse_int(script, script_index);
   return {
-      .instruction_fn = std::bind(mark_op, label, instruction_index),
+      .instruction_fn = std::bind(mark_op, label, instruction_index, std::placeholders::_1),
       .argument_size  = label_size,
   };
 }
@@ -102,7 +102,7 @@ InstructionParseResult get_call_fn(const std::string& script,
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
-      .instruction_fn = std::bind(call_op, label, instruction_index),
+      .instruction_fn = std::bind(call_op, label, instruction_index, std::placeholders::_1),
       .argument_size  = label_size,
   };
 }
@@ -111,7 +111,7 @@ InstructionParseResult get_jump_fn(const std::string& script, const std::size_t 
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
-      .instruction_fn = std::bind(jump_op, label),
+      .instruction_fn = std::bind(jump_op, label, std::placeholders::_1),
       .argument_size  = label_size,
   };
 }
@@ -120,7 +120,7 @@ InstructionParseResult get_jump_if_zero_fn(const std::string& script, const std:
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
-      .instruction_fn = std::bind(jump_if_zero_op, label),
+      .instruction_fn = std::bind(jump_if_zero_op, label, std::placeholders::_1),
       .argument_size  = label_size,
   };
 }
@@ -129,7 +129,7 @@ InstructionParseResult get_jump_if_negative_fn(const std::string& script, const 
 {
   const auto [label, label_size] = parse_int(script, index);
   return {
-      .instruction_fn = std::bind(jump_if_neg_op, label),
+      .instruction_fn = std::bind(jump_if_neg_op, label, std::placeholders::_1),
       .argument_size  = label_size,
   };
 }

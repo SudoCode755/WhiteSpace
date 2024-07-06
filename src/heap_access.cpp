@@ -1,7 +1,7 @@
 #include "heap_access.hpp"
 
 #include <core.hpp>
-#include <env.hpp>
+#include <program_state.hpp>
 
 #include <array>
 #include <cstddef>
@@ -21,17 +21,17 @@ static constexpr std::string_view RETRIEVE_TOKEN("\t");
 static constexpr std::string_view STORE_TAG("[STORE]");
 static constexpr std::string_view RETRIEVE_TAG("[RETRIEVE]");
 
-std::optional<std::size_t> heap_store()
+std::optional<std::size_t> heap_store(ProgramState& state)
 {
-  const int64_t value   = data::stack_pop();
-  const int64_t address = data::stack_pop();
-  data::heap_store(address, value);
+  const int64_t value   = state.data_memory.stack_pop();
+  const int64_t address = state.data_memory.stack_pop();
+  state.data_memory.heap_store(address, value);
   return std::nullopt;
 }
 
-std::optional<std::size_t> heap_retrieve()
+std::optional<std::size_t> heap_retrieve(ProgramState& state)
 {
-  data::stack_push(data::heap_retrieve(data::stack_pop()));
+  state.data_memory.stack_push(state.data_memory.heap_retrieve(state.data_memory.stack_pop()));
   return std::nullopt;
 }
 

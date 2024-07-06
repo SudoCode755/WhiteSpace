@@ -1,5 +1,7 @@
 #pragma once
 
+#include <program_state.hpp>
+
 #include <cstddef>
 #include <functional>
 #include <optional>
@@ -8,5 +10,5 @@
 struct InstructionParsingData;
 struct InstructionParseResult;
 
-using InstructionCallable  = std::function<std::optional<std::size_t>()>;
+using InstructionCallable  = std::function<std::optional<std::size_t>(ProgramState&)>;
 using InstructionGenerator = InstructionParseResult (*)(const std::string&, const std::size_t, const std::size_t);

@@ -1,7 +1,7 @@
 #include "arithmetic.hpp"
 
 #include <core.hpp>
-#include <env.hpp>
+#include <program_state.hpp>
 #include <utils.hpp>
 
 #include <array>
@@ -35,30 +35,30 @@ static constexpr std::string_view DIV_TAG("[DIV]");
 static constexpr std::string_view MOD_TAG("[MOD]");
 
 template<ArithmeticOp op>
-std::optional<std::size_t> generic_arithmetic_op()
+std::optional<std::size_t> generic_arithmetic_op(ProgramState& state)
 {
-  const int64_t second_operand = data::stack_pop();
-  const int64_t first_operand  = data::stack_pop();
+  const int64_t second_operand = state.data_memory.stack_pop();
+  const int64_t first_operand  = state.data_memory.stack_pop();
   if constexpr (op == ArithmeticOp::ADD)
   {
-    data::stack_push(first_operand + second_operand);
+    state.data_memory.stack_push(first_operand + second_operand);
   }
   else if constexpr (op == ArithmeticOp::SUB)
   {
-    data::stack_push(first_operand - second_operand);
+    state.data_memory.stack_push(first_operand - second_operand);
   }
   else if constexpr (op == ArithmeticOp::MUL)
   {
-    data::stack_push(first_operand * second_operand);
+    state.data_memory.stack_push(first_operand * second_operand);
   }
   else if constexpr (op == ArithmeticOp::DIV)
   {
-    data::stack_push(first_operand / second_operand);
+    state.data_memory.stack_push(first_operand / second_operand);
   }
   else if constexpr (op == ArithmeticOp::MOD)
   {
     const int64_t result = first_operand % second_operand;
-    data::stack_push((first_operand * second_operand < 0) ? result + second_operand : result);
+    state.data_memory.stack_push((first_operand * second_operand < 0) ? result + second_operand : result);
   }
   return std::nullopt;
 }
