@@ -62,7 +62,10 @@ static bool                                     terminated = false;
 
 void label_add(const int64_t label, const std::size_t address)
 {
-  labels[label] = address;
+  if(labels.insert({label,address}).second == false)
+  {
+    throw std::runtime_error("same label used twice");
+  }
 }
 
 std::size_t label_get(const int64_t label)
