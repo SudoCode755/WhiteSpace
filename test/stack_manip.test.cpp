@@ -62,3 +62,27 @@ TEST(STACK_MANIP, POP)
 
   ASSERT_EQ(output.str(), "72");
 }
+
+TEST(STACK_MANIP, POP_ERROR)
+{
+  const std::string script = " \n\n"   // pop
+                             "\t\n \t" // int out
+                             "\n\n\n"; // EXIT
+
+  std::ostringstream output;
+  std::istringstream script_in(script);
+
+  EXPECT_THROW(
+      {
+        try
+        {
+          run_script(script_in, output);
+        }
+        catch (const std::runtime_error& e)
+        {
+          EXPECT_STREQ("[STACK MANIP][POP] executing instruction 0: empty stack", e.what());
+          throw;
+        }
+      },
+      std::runtime_error);
+}

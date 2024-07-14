@@ -79,3 +79,72 @@ TEST(FLOW, SUBROUTINE)
 
   ASSERT_EQ(output.str(), "721");
 }
+
+TEST(FLOW, JUMP_LABEL_NOT_FOUND)
+{
+  const std::string script = "\n \n\t\t\n" // Jump to \t\t
+                             "   \t \n"    // 2
+                             "\t\n \t"     // int out
+                             "\n\n\n";     // EXIT
+
+  std::ostringstream output;
+  std::istringstream script_in(script);
+  EXPECT_THROW(
+      {
+        try
+        {
+          run_script(script_in, output);
+        }
+        catch (const std::runtime_error& e)
+        {
+          EXPECT_STREQ("[FLOW CONTROL][JUMP] executing instruction 0: label not found", e.what());
+          throw;
+        }
+      },
+      std::runtime_error);
+}
+
+TEST(FLOW, DOUBLE_LABEL)
+{
+  const std::string script = "\n  \t\t\n"
+                             "   \t \n"    // 2
+                             "\n\n\n"      // EXIT  // MARK \t\t
+                             "\n  \t\t\n"; // MARK \t\t
+
+  std::ostringstream output;
+  std::istringstream script_in(script);
+  EXPECT_THROW(
+      {
+        try
+        {
+          run_script(script_in, output);
+        }
+        catch (const std::runtime_error& e)
+        {
+          EXPECT_STREQ("[FLOW CONTROL][MARK] parsing instruction 3: same label used twice", e.what());
+          throw;
+        }
+      },
+      std::runtime_error);
+}
+
+TEST(FLOW, NO_SUBROUTINE)
+{
+  const std::string script = "\n\t\n"; // RETURN
+
+  std::ostringstream output;
+  std::istringstream script_in(script);
+  EXPECT_THROW(
+      {
+        try
+        {
+          run_script(script_in, output);
+        }
+        catch (const std::runtime_error& e)
+        {
+          EXPECT_STREQ("[FLOW CONTROL][RETURN] executing instruction 0: not in subroutine", e.what());
+          throw;
+        }
+      },
+      std::runtime_error);
+}

@@ -53,7 +53,7 @@ src/io_ops.cpp
 src/program_state.cpp
 src/stack_manip.cpp
 src/utils.cpp
-src/whiteSpace.cpp
+src/whitespace.cpp
 )
 
 set(INCLUDES "include" )

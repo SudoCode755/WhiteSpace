@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-bool ProgramState::get_terminated()
+bool ProgramState::get_terminated() const
 {
   return m_terminated;
 }
@@ -22,7 +22,7 @@ void DataMemory::stack_push(const int64_t value)
   data_stack.emplace_back(value);
 }
 
-int64_t DataMemory::stack_top()
+int64_t DataMemory::stack_top() const
 {
   if (data_stack.empty())
   {
@@ -47,12 +47,12 @@ void DataMemory::heap_store(const int64_t address, const int64_t value)
   data_heap[address] = value;
 }
 
-int64_t DataMemory::heap_retrieve(const int64_t address)
+int64_t DataMemory::heap_retrieve(const int64_t address) const
 {
   auto it = data_heap.find(address);
   if (it == data_heap.end())
   {
-    throw std::runtime_error("headp address not found");
+    throw std::runtime_error("heap address not found");
   }
   return it->second;
 }
@@ -65,7 +65,7 @@ void InstructionMemory::label_add(const int64_t label, const std::size_t address
   }
 }
 
-std::size_t InstructionMemory::label_get(const int64_t label)
+std::size_t InstructionMemory::label_get(const int64_t label) const
 {
   auto it = m_labels.find(label);
   if (it == m_labels.end())
@@ -73,6 +73,11 @@ std::size_t InstructionMemory::label_get(const int64_t label)
     throw std::runtime_error("label not found");
   }
   return it->second;
+}
+
+std::size_t InstructionMemory::number_of_labels() const
+{
+  return m_labels.size();
 }
 
 void InstructionMemory::return_address_push(const std::size_t address)

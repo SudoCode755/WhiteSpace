@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
+#include <stdexcept>
 
 TEST(ARITHMETIC, ADD)
 {
@@ -137,4 +138,29 @@ TEST(ARITHMETIC, MOD_NEG_BOTH)
   run_script(script_in, output);
 
   ASSERT_EQ(output.str(), "-1");
+}
+
+TEST(ARITHMETIC, EMPTY_STACK)
+{
+  const std::string script = "  \t\t\t\n" // -3
+                             "\t \t\t"    // MOD
+                             "\t\n \t"    // int out
+                             "\n\n\n";    // EXIT
+
+  std::ostringstream output;
+  std::istringstream script_in(script);
+
+  EXPECT_THROW(
+      {
+        try
+        {
+          run_script(script_in, output);
+        }
+        catch (const std::runtime_error& e)
+        {
+          EXPECT_STREQ("[ARITHMETIC][MOD] executing instruction 1: empty stack", e.what());
+          throw;
+        }
+      },
+      std::runtime_error);
 }

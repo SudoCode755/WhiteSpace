@@ -1,7 +1,7 @@
 include(GoogleTest)
 
 add_executable(WhiteSpace-Test 
-whiteSpace.test.cpp
+whitespace.test.cpp
 stack_manip.test.cpp
 arithmetic.test.cpp
 heap_access.test.cpp

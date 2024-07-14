@@ -116,15 +116,15 @@ constexpr std::pair<std::optional<Instruction>, std::size_t> try_parse(const std
     std::string message(imp_tag);
     message += parsed_op_tag;
     message += " parsing instruction ";
-    message += std::to_string(instruction_index);
+    message += std::to_string(instruction_index + state.instruction_memory.number_of_labels());
     message += ": ";
-    message += message += e.what();
+    message += e.what();
     throw std::runtime_error(message);
   }
 
   std::string message(imp_tag);
   message += "[ERROR] unknown operation parsing instruction ";
-  message += std::to_string(instruction_index);
+  message += std::to_string(instruction_index + state.instruction_memory.number_of_labels());
   throw std::invalid_argument(message);
 
   return {std::nullopt, -1};
@@ -235,6 +235,6 @@ void run_script(std::istream& script, std::ostream& output, std::istream& input)
   if (! state.get_terminated())
   {
     throw std::runtime_error("Prgroma terminated incorrectly "
-                             "[FLOW][EXIT](\"\\n\\n\\n\") was never executed");
+                             "[FLOW CONTROL][EXIT](\"\\n\\n\\n\") was never executed");
   }
 }

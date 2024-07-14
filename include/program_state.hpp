@@ -17,10 +17,10 @@ public:
   DataMemory& operator=(const DataMemory&) = delete;
 
   void    stack_push(const int64_t value);
-  int64_t stack_top();
+  int64_t stack_top() const;
   int64_t stack_pop();
   void    heap_store(const int64_t address, const int64_t value);
-  int64_t heap_retrieve(const int64_t address);
+  int64_t heap_retrieve(const int64_t address) const;
 
 private:
   std::vector<int64_t>                 data_stack;
@@ -37,8 +37,10 @@ public:
   InstructionMemory(const InstructionMemory&)            = delete;
   InstructionMemory& operator=(const InstructionMemory&) = delete;
 
-  void                      label_add(const int64_t label, const std::size_t address);
-  std::size_t               label_get(const int64_t label);
+  void        label_add(const int64_t label, const std::size_t address);
+  std::size_t label_get(const int64_t label) const;
+  std::size_t number_of_labels() const;
+
   void                      return_address_push(const std::size_t address);
   [[nodiscard]] std::size_t return_address_pop();
 
@@ -81,7 +83,7 @@ struct ProgramState
   IOSettings        io_settings;
 
   void set_terminated();
-  bool get_terminated();
+  bool get_terminated() const;
 
 private:
   bool m_terminated = false;
